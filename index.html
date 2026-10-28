@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="fil">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Evaluation: FLN AI-Assisted Digital Learning</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Nunito:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#E6F0EA; --ink:#10302B; --muted:#4F6B64; --card:#FFFFFF;
+  --green:#1E6F5C; --green-d:#14503F; --mango:#F5B83D; --mango-l:#FDEFC8;
+  --line:#C9DBD2; --err:#B3261E;
+  --h:'Baloo 2','Trebuchet MS',system-ui,sans-serif; --b:'Nunito',system-ui,-apple-system,'Segoe UI',sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0E1F1B; --ink:#E4F0EA; --muted:#9DB8AF; --card:#16302A; --line:#27483F;
+    --green:#4FB89C; --green-d:#7ED3BA; --mango:#F5B83D; --mango-l:#3A3115;
+  }
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;min-height:100%}
+body{font-family:var(--b);background:var(--bg);color:var(--ink);font-size:17px;line-height:1.5;
+  padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px)}
+h1,h2,h3{font-family:var(--h);line-height:1.15;margin:0 0 .4em}
+.wrap{max-width:520px;margin:0 auto;padding:18px 18px 32px;min-height:100vh;display:flex;flex-direction:column}
+.wrap.wide{max-width:980px}
+.top{display:flex;align-items:center;gap:12px;margin-bottom:14px;min-height:40px}
+.bar{flex:1;height:10px;background:var(--line);border-radius:99px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--green);border-radius:99px;transition:width .3s}
+.count{font-weight:800;color:var(--muted);font-size:14px;min-width:44px;text-align:right}
+.back{border:0;background:transparent;color:var(--green-d);font:800 15px var(--b);padding:8px 4px;cursor:pointer}
+.back[hidden]{display:none}
+.cat{display:inline-block;background:var(--mango-l);color:var(--ink);font-weight:800;font-size:14px;padding:3px 12px;border-radius:99px;margin-bottom:10px}
+.q{font-size:26px;font-weight:700;margin-bottom:18px}
+.opts{display:flex;flex-direction:column;gap:10px}
+.opt{display:flex;align-items:center;gap:14px;width:100%;text-align:left;background:var(--card);
+  border:2.5px solid var(--line);border-radius:18px;padding:10px 16px;cursor:pointer;color:var(--ink);font-family:var(--b);
+  transition:transform .12s,border-color .12s,background .12s}
+.opt:active{transform:scale(.98)}
+.opt .em{font-size:40px;line-height:1;width:52px;text-align:center}
+.opt b{display:block;font-family:var(--h);font-size:21px;font-weight:700;line-height:1.1}
+.opt span{font-size:14px;color:var(--muted)}
+.opt.sel{border-color:var(--green);background:var(--mango-l)}
+.opt.sel .em{animation:pop .35s}
+@keyframes pop{50%{transform:scale(1.35) rotate(-6deg)}}
+.hero{text-align:center;margin:auto 0}
+.hero .big{font-size:64px;letter-spacing:6px}
+.hero h1{font-size:34px;font-weight:800}
+.hero p{color:var(--muted);margin:.3em 0 1.2em}
+.legend{display:flex;justify-content:center;gap:8px;font-size:30px;margin:14px 0 4px}
+.btn{display:block;width:100%;border:0;border-radius:16px;padding:15px;font:700 20px var(--h);cursor:pointer;
+  background:var(--green);color:#fff;margin-top:14px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.alt{background:transparent;color:var(--green-d);border:2.5px solid var(--green)}
+.chips{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:14px}
+.chip{border:2.5px solid var(--line);background:var(--card);color:var(--ink);border-radius:99px;padding:10px 18px;
+  font:700 18px var(--b);cursor:pointer}
+.chip.sel{border-color:var(--green);background:var(--mango-l)}
+.inp{width:100%;font:600 22px var(--b);padding:14px 16px;border-radius:14px;border:2.5px solid var(--line);
+  background:var(--card);color:var(--ink)}
+.inp:focus{outline:3px solid var(--mango);border-color:var(--green)}
+.hint{font-size:14px;color:var(--muted);margin:6px 2px 0}
+.err{color:var(--err);font-weight:700;font-size:15px;margin-top:8px}
+.note{background:var(--mango-l);border-radius:12px;padding:10px 14px;font-size:14px;margin-top:14px}
+/* dashboard */
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:14px 0}
+.kpi{background:var(--card);border:2px solid var(--line);border-radius:16px;padding:14px}
+.kpi small{color:var(--muted);font-weight:700}
+.kpi div{font:800 34px var(--h);line-height:1.1}
+.panel{background:var(--card);border:2px solid var(--line);border-radius:18px;padding:16px;margin-bottom:14px}
+.panel h3{font-size:20px}
+.row{display:grid;grid-template-columns:34px 1fr 48px;gap:10px;align-items:center;margin:8px 0;font-size:15px}
+.row .tr{height:18px;background:var(--line);border-radius:99px;overflow:hidden}
+.row .tr i{display:block;height:100%;border-radius:99px;background:var(--green)}
+.row em{font-style:normal;font-weight:800;text-align:right}
+.qtext{font-size:14px;color:var(--muted);margin:-2px 0 2px 44px}
+.cloud{display:flex;flex-wrap:wrap;gap:6px 16px;align-items:center;justify-content:center;padding:10px 4px;min-height:80px}
+.cloud span{font-family:var(--h);font-weight:700;line-height:1.1}
+.top5{margin:8px 0 0;padding-left:20px;color:var(--muted);font-size:15px}
+.top5 b{color:var(--ink)}
+.tools{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0}
+.tools .btn{width:auto;margin:0;padding:10px 18px;font-size:17px}
+select{font:700 16px var(--b);padding:10px 12px;border-radius:12px;border:2px solid var(--line);background:var(--card);color:var(--ink);max-width:100%}
+@media print{.tools,.top{display:none}body{background:#fff}}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+
+<script>
+/* ============ CONFIG (palitan ito) ============ */
+const SCRIPT_URL = 'PASTE_WEB_APP_URL_HERE';   // Apps Script Web app URL
+const DEFAULT_TITLE = 'Enhancing Foundational Literacy and Numeracy through AI-Assisted Digital Learning Application Development';
+const DEFAULT_ID = 'FLN-AI-2026';
+const VENUE = 'FAAS LOFTS, San Agustin, Romblon';
+const DATES_LABEL = 'October 28–30, 2026';
+const DAYS = [
+  {n:1, label:'Day 1', date:'2026-10-28', text:'Oktubre 28'},
+  {n:2, label:'Day 2', date:'2026-10-29', text:'Oktubre 29'},
+  {n:3, label:'Day 3', date:'2026-10-30', text:'Oktubre 30'}
+];
+/* ============================================== */
+
+const params = new URLSearchParams(location.search);
+const TITLE = params.get('t') || DEFAULT_TITLE;
+const TID = params.get('id') || DEFAULT_ID;
+let DAY = parseInt(params.get('day'),10) || 0;
+if(!DAYS.some(d=>d.n===DAY)){
+  const t = new Date(), iso = t.getFullYear()+'-'+String(t.getMonth()+1).padStart(2,'0')+'-'+String(t.getDate()).padStart(2,'0');
+  const m = DAYS.find(d=>d.date===iso); DAY = m ? m.n : 0;
+}
+const doneKey = () => 'evalDone:' + TID + ':day' + DAY;
+const dayLabel = n => (DAYS.find(d=>d.n===n)||{label:'Day '+n}).label;
+const QUEUE_KEY = 'evalQueue';
+
+const SCALE = [
+  {n:1, em:'🐌', name:'Suso',    desc:'Kailangan pang pagbutihin'},
+  {n:2, em:'🐢', name:'Pagong',  desc:'Fair'},
+  {n:3, em:'🐃', name:'Kalabaw', desc:'Satisfactory'},
+  {n:4, em:'🐎', name:'Kabayo',  desc:'Very Satisfactory'},
+  {n:5, em:'🦅', name:'Agila',   desc:'Outstanding'}
+];
+
+const RATINGS = [
+  {cat:'Nilalaman', t:'Malinaw ang mga layunin ng training.'},
+  {cat:'Nilalaman', t:'Akma sa trabaho ko ang mga paksa.'},
+  {cat:'Nilalaman', t:'Sapat ang lalim at dami ng nilalaman.'},
+  {cat:'Resource Speaker', t:'Malinaw at organisado ang pagtuturo.'},
+  {cat:'Resource Speaker', t:'May sapat na kaalaman sa paksa.'},
+  {cat:'Resource Speaker', t:'Nabigyan ako ng pagkakataong magtanong at makilahok.'},
+  {cat:'Pamamaraan at Materyales', t:'Epektibo ang mga gawain (hands-on, group work).'},
+  {cat:'Pamamaraan at Materyales', t:'Kapaki-pakinabang ang mga handout, slides, at tools.'},
+  {cat:'Pasilidad at Pamamahala', t:'Maayos ang venue, oras, at iskedyul.'},
+  {cat:'Pasilidad at Pamamahala', t:'Maayos ang pagkain at pag-aasikaso ng organizers.'},
+  {cat:'Resulta', t:'May natutunan akong magagamit ko agad sa paaralan o trabaho.'},
+  {cat:'Resulta', t:'Irerekomenda ko ang training na ito sa iba.'}
+];
+
+const WORDS = [
+  {t:'Ilarawan ang training sa isang salita.', short:'Paglalarawan', sug:['Makabuluhan','Praktikal','Masaya','Nakakapagod','Kulang-oras']},
+  {t:'Ano ang pinakamahalaga mong natutunan? Isang salita lang.', short:'Natutunan', sug:['Teknolohiya','Pagpaplano','Pagtutulungan','Assessment','Pamumuno']},
+  {t:'Ano ang dapat pagbutihin? Isang salita lang.', short:'Pagbutihin', sug:['Oras','Venue','Materyales','Pagkain','Iskedyul']},
+  {t:'Anong paksa ang gusto mo sa susunod na training? Isang salita lang.', short:'Susunod na paksa', sug:['AI','Numeracy','Literacy','Assessment','Pagbasa']}
+];
+
+const NR = RATINGS.length, NW = WORDS.length, TOTAL = NR + NW;
+const ans = {q:Array(NR).fill(0), w:Array(NW).fill('')};
+let step = -1;               // -1 welcome, 0..TOTAL-1 questions, TOTAL done
+const $ = s => document.querySelector(s);
+const app = $('#app');
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+/* ---------- participant flow ---------- */
+function shell(inner, showBack){
+  const pct = Math.max(0, Math.min(100, (step / TOTAL) * 100));
+  return `<div class="top">
+    <button class="back" id="back" ${showBack?'':'hidden'} aria-label="Bumalik">← Balik</button>
+    <div class="bar" role="progressbar" aria-valuenow="${Math.round(pct)}" aria-valuemin="0" aria-valuemax="100"><i style="width:${pct}%"></i></div>
+    <div class="count">${step+1}/${TOTAL}</div></div>${inner}`;
+}
+
+function render(){
+  window.scrollTo(0,0);
+  if(step === -1) return welcome();
+  if(step >= TOTAL) return thanks();
+  if(step < NR) return rating();
+  return word();
+}
+
+function welcome(){
+  const done = DAY && localStorage.getItem(doneKey());
+  app.innerHTML = `<div class="hero">
+    <div class="big" aria-hidden="true">🐌🐢🐃🐎🦅</div>
+    <h1 style="font-size:25px">${esc(TITLE)}</h1>
+    <p style="margin-bottom:.8em">📍 ${esc(VENUE)}<br>🗓️ ${esc(DATES_LABEL)}</p>
+    <div class="panel" style="text-align:left">
+      <b>Anong araw ang ie-evaluate mo?</b>
+      <div class="chips" style="margin:10px 0 0" id="days">${DAYS.map(d=>`<button class="chip ${DAY===d.n?'sel':''}" data-d="${d.n}">${d.label} <small>(${d.text})</small></button>`).join('')}</div>
+      ${done?`<div class="note">Nasagutan na ng device na ito ang ${dayLabel(DAY)}. Pumili ng ibang araw kung kailangan.</div>`:''}
+    </div>
+    <div class="panel" style="text-align:left">
+      ${SCALE.map(s=>`<div class="row" style="grid-template-columns:40px 1fr;margin:4px 0"><span style="font-size:28px">${s.em}</span><span><b>${s.name}</b>: ${s.desc}</span></div>`).join('')}
+    </div>
+    <p style="font-size:15px">Anonymous at mga 2 minuto lang. Pindutin ang hayop na bagay sa sagot mo.</p>
+    <button class="btn" id="start" ${DAY&&!done?'':'disabled'}>Simulan</button></div>`;
+  document.querySelectorAll('#days .chip').forEach(c => c.onclick = () => { DAY = +c.dataset.d; welcome(); });
+  $('#start').onclick = () => { step = 0; render(); };
+}
+
+function rating(){
+  const r = RATINGS[step], cur = ans.q[step];
+  app.innerHTML = shell(`
+    <span class="cat">${dayLabel(DAY)}: ${esc(r.cat)}</span>
+    <div class="q">${esc(r.t)}</div>
+    <div class="opts">${SCALE.map(s=>`
+      <button class="opt ${cur===s.n?'sel':''}" data-n="${s.n}" aria-label="${s.name}: ${s.desc}">
+        <span class="em">${s.em}</span><div><b>${s.name}</b><span>${s.desc}</span></div>
+      </button>`).join('')}</div>`, step>0);
+  document.querySelectorAll('.opt').forEach(b => b.onclick = () => {
+    ans.q[step] = +b.dataset.n;
+    document.querySelectorAll('.opt').forEach(x => x.classList.toggle('sel', x===b));
+    setTimeout(() => { step++; render(); }, 330);
+  });
+  bindBack();
+}
+
+function cleanWord(v){ return v.replace(/[^\p{L}\p{N}-]/gu,'').slice(0,20); }
+
+function word(){
+  const i = step - NR, w = WORDS[i];
+  const cur = ans.w[i];
+  const isSug = w.sug.includes(cur);
+  app.innerHTML = shell(`
+    <span class="cat">${dayLabel(DAY)}: isang salita lang</span>
+    <div class="q">${esc(w.t)}</div>
+    <div class="chips">${w.sug.map(s=>`<button class="chip ${cur===s?'sel':''}" data-w="${esc(s)}">${esc(s)}</button>`).join('')}</div>
+    <input class="inp" id="inp" maxlength="20" autocomplete="off" autocapitalize="sentences"
+      placeholder="Iba pa… mag-type ng isang salita" value="${isSug?'':esc(cur)}" aria-label="Isang salita">
+    <div class="hint">Isang salita lang, hanggang 20 letra.</div>
+    <div class="err" id="err" role="alert"></div>
+    <button class="btn" id="next" ${cur?'':'disabled'}>${step===TOTAL-1?'Ipadala':'Susunod'}</button>`, true);
+  const inp = $('#inp'), next = $('#next');
+  document.querySelectorAll('.chip').forEach(c => c.onclick = () => {
+    ans.w[i] = c.dataset.w; inp.value = '';
+    document.querySelectorAll('.chip').forEach(x => x.classList.toggle('sel', x===c));
+    next.disabled = false;
+  });
+  inp.addEventListener('input', () => {
+    const cleaned = cleanWord(inp.value);
+    $('#err').textContent = (inp.value !== cleaned && /\s/.test(inp.value)) ? 'Isang salita lang po, walang espasyo.' : '';
+    inp.value = cleaned; ans.w[i] = cleaned;
+    document.querySelectorAll('.chip').forEach(x => x.classList.remove('sel'));
+    next.disabled = !cleaned;
+  });
+  next.onclick = () => {
+    if(!ans.w[i]) return;
+    if(step === TOTAL-1) return submit(next);
+    step++; render();
+  };
+  bindBack();
+}
+
+function bindBack(){ const b=$('#back'); if(b) b.onclick = () => { step--; render(); }; }
+
+async function post(payload){
+  if(!SCRIPT_URL || SCRIPT_URL.startsWith('PASTE')) throw new Error('demo');
+  await fetch(SCRIPT_URL, {method:'POST', mode:'no-cors', headers:{'Content-Type':'text/plain;charset=utf-8'}, body:JSON.stringify(payload)});
+}
+function queue(p){ try{ const q=JSON.parse(localStorage.getItem(QUEUE_KEY)||'[]'); q.push(p); localStorage.setItem(QUEUE_KEY, JSON.stringify(q)); }catch(e){} }
+async function flush(){
+  let q=[]; try{ q=JSON.parse(localStorage.getItem(QUEUE_KEY)||'[]'); }catch(e){}
+  if(!q.length) return;
+  const rest=[];
+  for(const p of q){ try{ await post(p); }catch(e){ rest.push(p); } }
+  try{ localStorage.setItem(QUEUE_KEY, JSON.stringify(rest)); }catch(e){}
+}
+
+let demoMode = false;
+async function submit(btn){
+  btn.disabled = true; btn.textContent = 'Ipinapadala…';
+  const payload = {id:TID, title:TITLE, day:DAY, q:ans.q, w:ans.w};
+  try{ await post(payload); }
+  catch(e){ if(e.message==='demo') demoMode = true; else queue(payload); }
+  try{ localStorage.setItem(doneKey(), '1'); }catch(e){}
+  step = TOTAL; render();
+}
+
+function thanks(){
+  const avg = (ans.q.reduce((a,b)=>a+b,0)/NR);
+  app.innerHTML = `<div class="hero"><div class="big">🦅</div><h1>Maraming salamat po!</h1>
+    <p>Natanggap na ang evaluation mo para sa <b>${dayLabel(DAY)}</b>. Malaking tulong ito para mapabuti ang susunod na araw at susunod na training.</p>
+    <button class="btn alt" id="other">Mag-evaluate ng ibang araw</button>
+    ${demoMode?'<div class="note">Demo mode: wala pang SCRIPT_URL, kaya hindi pa nase-save sa Google Sheet.</div>':''}</div>`;
+  $('#other').onclick = () => { ans.q.fill(0); ans.w.fill(''); DAY = 0; step = -1; render(); };
+}
+
+/* ---------- dashboard (#admin) ---------- */
+const ST = {rows:[], id:'ALL', day:'ALL', key:''};
+const norm = s => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9ñ-]/g,'');
+const mean = a => a.length ? a.reduce((x,y)=>x+y,0)/a.length : 0;
+const interp = v => v>=4.5?'Outstanding':v>=3.5?'Very Satisfactory':v>=2.5?'Satisfactory':v>=1.5?'Fair':'Kailangan pang pagbutihin';
+const animalFor = v => SCALE[Math.max(0,Math.min(4,Math.round(v)-1))].em;
+
+function adminLogin(msg){
+  app.className = 'wrap';
+  app.innerHTML = `<div class="hero"><div class="big">📊</div><h1>Dashboard</h1><p>Para sa organizer lang.</p>
+    <input class="inp" id="key" type="password" placeholder="Passcode" autocomplete="current-password">
+    <div class="err">${esc(msg||'')}</div>
+    <button class="btn" id="go">Buksan</button></div>`;
+  const go = async () => {
+    ST.key = $('#key').value; if(!ST.key) return;
+    $('#go').textContent = 'Kinukuha ang datos…';
+    try{
+      const r = await fetch(SCRIPT_URL + '?action=results&key=' + encodeURIComponent(ST.key));
+      const d = await r.json();
+      if(!d.ok) return adminLogin(d.error || 'Hindi mabuksan.');
+      ST.rows = d.rows; ST.id = params.get('id') || 'ALL'; sessionStorage.setItem('evalKey', ST.key);
+      dash();
+    }catch(e){ adminLogin('Hindi makakonekta. Tingnan ang SCRIPT_URL at internet.'); }
+  };
+  $('#go').onclick = go; $('#key').onkeydown = e => { if(e.key==='Enter') go(); };
+}
+
+function wordStats(rows, i){
+  const map = {};
+  rows.forEach(r => { const raw=(r.w[i]||'').trim(); const k=norm(raw); if(!k) return;
+    (map[k] = map[k] || {n:0, forms:{}}).n++; map[k].forms[raw] = (map[k].forms[raw]||0)+1; });
+  return Object.values(map).map(o => ({
+    label: Object.entries(o.forms).sort((a,b)=>b[1]-a[1])[0][0].replace(/^./, c=>c.toUpperCase()), n:o.n
+  })).sort((a,b)=>b.n-a.n);
+}
+
+function dash(){
+  app.className = 'wrap wide';
+  const ids = [...new Set(ST.rows.map(r=>r.id))];
+  const byId = ST.id==='ALL' ? ST.rows : ST.rows.filter(r=>r.id===ST.id);
+  const rows = ST.day==='ALL' ? byId : byId.filter(r=>String(r.day)===String(ST.day));
+  const title = rows.length ? rows[rows.length-1].title : '';
+  const avgs = RATINGS.map((_,i)=>mean(rows.map(r=>r.q[i]).filter(n=>n>0)));
+  const overall = mean(avgs.filter(a=>a>0));
+  const cats = [...new Set(RATINGS.map(r=>r.cat))];
+  const colors = ['#1E6F5C','#C2571A','#7B4FB3','#B3261E','#2B7BB9','#8A7A00'];
+
+  const dayRows = DAYS.map(d=>{
+    const rs = byId.filter(r=>String(r.day)===String(d.n));
+    const v = mean(rs.map(r=>mean(r.q.filter(n=>n>0))).filter(x=>x));
+    return `<div class="row" style="grid-template-columns:70px 1fr 90px"><b>${d.label}</b><div class="tr"><i style="width:${v/5*100}%"></i></div><em>${v?animalFor(v)+' '+v.toFixed(2):'–'} <small style="font-weight:600;color:var(--muted)">(${rs.length})</small></em></div>`;
+  }).join('');
+  const bars = RATINGS.map((r,i)=>`
+    <div class="row"><span style="font-size:24px">${avgs[i]?animalFor(avgs[i]):'–'}</span>
+      <div class="tr"><i style="width:${avgs[i]/5*100}%"></i></div><em>${avgs[i]?avgs[i].toFixed(2):'–'}</em></div>
+    <div class="qtext">${i+1}. ${esc(r.t)}</div>`).join('');
+
+  const catRows = cats.map(c=>{
+    const v = mean(RATINGS.map((r,i)=>r.cat===c?avgs[i]:null).filter(x=>x));
+    return `<div class="row" style="grid-template-columns:1fr 48px"><div><b>${esc(c)}</b><div class="tr"><i style="width:${v/5*100}%"></i></div></div><em>${v?v.toFixed(2):'–'}</em></div>`;
+  }).join('');
+
+  const clouds = WORDS.map((w,i)=>{
+    const st = wordStats(rows,i), max = st[0]?st[0].n:1;
+    const cloud = st.slice(0,40).map((s,j)=>`<span style="font-size:${14+Math.round(26*s.n/max)}px;color:${colors[j%colors.length]}">${esc(s.label)}</span>`).join('') || '<span style="color:var(--muted);font-size:15px">Wala pang sagot</span>';
+    const top = st.slice(0,5).map(s=>`<li><b>${esc(s.label)}</b> (${s.n})</li>`).join('');
+    return `<div class="panel"><h3>${esc(w.t)}</h3><div class="cloud">${cloud}</div><ol class="top5">${top}</ol></div>`;
+  }).join('');
+
+  app.innerHTML = `
+    <div class="top"><div style="flex:1"><h1 style="margin:0;font-size:28px">Resulta ng Evaluation</h1>
+      <div style="color:var(--muted)">${esc(title || 'Lahat ng training')}<br>${ST.day==='ALL'?'Lahat ng araw':dayLabel(+ST.day)} · ${esc(VENUE)}</div></div></div>
+    <div class="tools">
+      <select id="sel" aria-label="Piliin ang training"><option value="ALL">Lahat ng training</option>
+        ${ids.map(x=>`<option value="${esc(x)}" ${x===ST.id?'selected':''}>${esc(x)}</option>`).join('')}</select>
+      <select id="dsel" aria-label="Piliin ang araw"><option value="ALL">Lahat ng araw</option>
+        ${DAYS.map(d=>`<option value="${d.n}" ${String(d.n)===String(ST.day)?'selected':''}>${d.label} (${d.text})</option>`).join('')}</select>
+      <button class="btn alt" id="ref">Refresh</button>
+      <button class="btn alt" id="csv">I-download ang CSV</button>
+      <button class="btn alt" id="prt">I-print</button></div>
+    <div class="kpis">
+      <div class="kpi"><small>Sumagot</small><div>${rows.length}</div></div>
+      <div class="kpi"><small>Overall (1–5)</small><div>${overall?overall.toFixed(2):'–'}</div></div>
+      <div class="kpi"><small>Hayop</small><div>${overall?animalFor(overall):'–'}</div></div>
+      <div class="kpi"><small>Interpretasyon</small><div style="font-size:20px">${overall?interp(overall):'–'}</div></div></div>
+    <div class="panel"><h3>Paghahambing kada araw</h3>${dayRows}</div>
+    <div class="panel"><h3>Average kada kategorya</h3>${catRows}</div>
+    <div class="panel"><h3>Average kada tanong</h3>${bars}</div>
+    ${clouds}`;
+  $('#sel').onchange = e => { ST.id = e.target.value; dash(); };
+  $('#dsel').onchange = e => { ST.day = e.target.value; dash(); };
+  $('#prt').onclick = () => window.print();
+  $('#ref').onclick = async () => { try{ const d = await (await fetch(SCRIPT_URL+'?action=results&key='+encodeURIComponent(ST.key))).json(); if(d.ok){ST.rows=d.rows; dash();} }catch(e){} };
+  $('#csv').onclick = () => {
+    const head = ['Timestamp','TrainingID','Training','Day',...RATINGS.map((_,i)=>'Q'+(i+1)),...WORDS.map(w=>w.short)];
+    const lines = [head, ...rows.map(r=>[r.t,r.id,r.title,r.day,...r.q,...r.w])]
+      .map(l=>l.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(',')).join('\n');
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob(['\ufeff'+lines],{type:'text/csv'}));
+    a.download = 'evaluation-' + (ST.id==='ALL'?'lahat':ST.id) + '.csv'; a.click();
+  };
+}
+
+/* ---------- start ---------- */
+if(location.hash === '#admin'){
+  document.title = 'Dashboard · Evaluation';
+  adminLogin();
+} else {
+  flush();
+  render();
+}
+</script>
+</body>
+</html>
